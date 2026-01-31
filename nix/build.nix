@@ -1,28 +1,33 @@
 {
-  lib,
-  buildPnpmPackage,
+  pnpm,
+  stdenv,
+  nodejs,
+  fetchPnpmDeps,
+  pnpmConfigHook,
 }:
-buildPnpmPackage {
-  pname = "website";
+stdenv.mkDerivation rec {
+  pname = "The Document Format Web Viewer";
   version = "0.1.0";
-
   src = ../.;
 
-  npmDepsHash = lib.fakeHash;
+  buildInputs = [
+    nodejs
+    pnpmConfigHook
+    pnpm
+  ];
 
-  npmBuildScript = "build";
-
-  installPhase = ''
-    runHook preInstall
-    mkdir -p $out
-    cp -r dist/* $out/
-    runHook postInstall
-  '';
-
-  meta = with lib; {
-    description = "Website";
-    homepage = "https://github.com/example/website";
-    license = licenses.mit;
-    maintainers = [ ];
+  pnpmDeps = fetchPnpmDeps {
+    inherit pname version src;
+    fetcherVersion = 3;
+    hash = "sha256-pabl7CT8WNEwZND22TX3TdtdWvkBZKzd9rcUho9O66c=";
   };
+
+  SHOW_UPDATED = "false";
+  FETCH_RESUME = "false";
+
+  buildPhase = ''
+    mkdir $out
+    pnpm build
+    cp -r dist $out
+  '';
 }
