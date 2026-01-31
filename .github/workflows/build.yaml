@@ -24,6 +24,9 @@ jobs:
           primary-key: nix-${{ runner.os }}-${{ hashFiles('**/flake.lock') }}
           restore-prefixes-first-match: nix-${{ runner.os }}-
 
+      - name: Run Nix flake check
+        run: nix flake check
+
       - name: Build with Nix
         run: nix build
 
